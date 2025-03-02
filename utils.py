@@ -93,6 +93,15 @@ def get_length(element):
             length += 2
     return length
 
+def number_to_excel_column(n):
+    column_name = ""
+    n += 1
+    while n > 0:
+        n -= 1
+        column_name = chr(n % 26 + ord('A')) + column_name
+        n //= 26
+    return column_name
+
 def excel_writer(filename, sheets: dict):
     writer = pd.ExcelWriter(filename)
     for sheet_name, df in sheets.items():
@@ -102,9 +111,9 @@ def excel_writer(filename, sheets: dict):
             max_len = get_length(df[column].name)
             for entry in list(df[column]):
                 max_len = max(max_len, get_length(entry))
-            worksheet.set_column(index + 1, index + 1, max_len + 1)
+            worksheet.column_dimensions[number_to_excel_column(index + 1)].width = max_len + 2
         max_len = 0
         for entry in list(df.index):
             max_len = max(max_len, get_length(entry))
-        worksheet.set_column(0, 0, max_len + 1)
+        worksheet.column_dimensions[number_to_excel_column(0)].width = max_len + 2
     writer._save()
